@@ -1,0 +1,22 @@
+spring:
+
+  application:
+    admin:
+      enabled: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=poolmate
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jackson:
+    serialization:
+      write_dates_as_timestamps: false
+
+  jpa:
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+      use-new-id-generator-mappings: true
