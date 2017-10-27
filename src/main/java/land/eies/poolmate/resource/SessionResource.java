@@ -14,9 +14,7 @@ public class SessionResource {
 
     @GetMapping
     public ResponseEntity<Collection<Session>> getSessions() {
-        final Session session = new Session();
-        session.setId(1L);
-        session.setDate(LocalDate.now());
+        final Session session = new Session(1L, LocalDate.now());
 
         final Collection<Session> sessions = new ArrayList<>();
         sessions.add(session);
