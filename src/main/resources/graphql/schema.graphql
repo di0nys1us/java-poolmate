@@ -1,0 +1,178 @@
+scalar Duration
+scalar LocalDate
+scalar Email
+
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Query {
+    user(id: Long, email: String): User
+    users: [User!]!
+    session(id: Long!): Session
+    sessions(range: DateRange): [Session!]!
+    sessionSet(id: Long!): SessionSet
+    sessionSets(sessionId: Long): [SessionSet!]!
+}
+
+type User {
+    id: Long!
+    version: Long!
+    deleted: Boolean!
+    firstName: String!
+    lastName: String!
+    email: String!
+    administrator: Boolean!
+    sessions(range: DateRange): [Session!]!
+}
+
+type Session {
+    id: Long!
+    version: Long!
+    deleted: Boolean!
+    date: LocalDate!
+    poolLength: Int!
+    calories: Int!
+    user: User!
+    sessionSets: [SessionSet!]!
+}
+
+type SessionSet {
+    id: Long!
+    version: Long!
+    deleted: Boolean!
+    number: Int!
+    swimmingTime: Duration!
+    restTime: Duration!
+    laps: Int!
+    averageStrokes: Int!
+    speed: Int!
+    efficiencyIndex: Int!
+    session: Session!
+}
+
+type Mutation {
+    createUser(input: CreateUserInput!): CreateUserOutput!
+    updateUser(input: UpdateUserInput!): UpdateUserOutput!
+    deleteUser(input: DeleteUserInput!): DeleteUserOutput!
+    createSession(input: CreateSessionInput!): CreateSessionOutput!
+    updateSession(input: UpdateSessionInput!): UpdateSessionOutput!
+    deleteSession(input: DeleteSessionInput!): DeleteSessionOutput!
+    createSessionSet(input: CreateSessionSetInput!): CreateSessionSetOutput!
+    updateSessionSet(input: UpdateSessionSetInput!): UpdateSessionSetOutput!
+    deleteSessionSet(input: DeleteSessionSetInput!): DeleteSessionSetOutput!
+}
+
+input DateRange {
+    minimum: LocalDate!
+    maximum: LocalDate!
+}
+
+input CreateUserInput {
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+    administrator: Boolean!
+}
+
+type CreateUserOutput {
+    user: User
+}
+
+input UpdateUserInput {
+    id: Long!
+    version: Long!
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+    administrator: Boolean!
+}
+
+type UpdateUserOutput {
+    user: User
+}
+
+input DeleteUserInput {
+    id: Long!
+    version: Long!
+    permanently: Boolean!
+}
+
+type DeleteUserOutput {
+    deleted: Boolean!
+}
+
+input CreateSessionInput {
+    userId: Long!
+    date: LocalDate!
+    poolLength: Int!
+    calories: Int!
+}
+
+type CreateSessionOutput {
+    session: Session
+}
+
+input UpdateSessionInput {
+    id: Long!
+    version: Long!
+    date: LocalDate!
+    poolLength: Int!
+    calories: Int!
+}
+
+type UpdateSessionOutput {
+    session: Session
+}
+
+input DeleteSessionInput {
+    id: Long!
+    version: Long!
+    permanently: Boolean!
+}
+
+type DeleteSessionOutput {
+    deleted: Boolean!
+}
+
+input CreateSessionSetInput {
+    sessionId: Long!
+    swimmingTime: Duration!
+    restTime: Duration!
+    laps: Int!
+    averageStrokes: Int!
+    speed: Int!
+    efficiencyIndex: Int!
+}
+
+type CreateSessionSetOutput {
+    sessionSet: SessionSet
+}
+
+input UpdateSessionSetInput {
+    id: Long!
+    version: Long!
+    swimmingTime: Duration!
+    restTime: Duration!
+    laps: Int!
+    averageStrokes: Int!
+    speed: Int!
+    efficiencyIndex: Int!
+}
+
+type UpdateSessionSetOutput {
+    sessionSet: SessionSet
+}
+
+input DeleteSessionSetInput {
+    id: Long!
+    version: Long!
+    permanently: Boolean!
+}
+
+type DeleteSessionSetOutput {
+    deleted: Boolean!
+}
