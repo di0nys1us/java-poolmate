@@ -11,6 +11,7 @@ import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import java.io.Serializable;
 
@@ -35,12 +36,15 @@ public class User implements Serializable, Deletable, Persistable<Long> {
     @Column(name = "version", nullable = false)
     private Long version;
 
+    @NotNull
     @Column(name = "deleted", nullable = false)
     private Boolean deleted = false;
 
+    @NotEmpty
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
+    @NotEmpty
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
@@ -49,9 +53,11 @@ public class User implements Serializable, Deletable, Persistable<Long> {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @NotEmpty
     @Column(name = "hashed_password", nullable = false)
     private String hashedPassword;
 
+    @NotNull
     @Column(name = "administrator", nullable = false)
     private Boolean administrator = false;
 

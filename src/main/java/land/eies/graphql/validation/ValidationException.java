@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class BeanValidationException extends RuntimeException implements GraphQLError {
+public class ValidationException extends RuntimeException implements GraphQLError {
 
     private static final long serialVersionUID = 1L;
 
     private final Set<ConstraintViolation> violations = new HashSet<>();
 
-    public BeanValidationException(final Set<ConstraintViolation> violations) {
+    public ValidationException(final Set<ConstraintViolation> violations) {
         if (violations != null) {
             this.violations.addAll(violations);
         }

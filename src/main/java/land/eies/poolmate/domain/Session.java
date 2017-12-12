@@ -13,6 +13,9 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Positive;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -38,18 +41,26 @@ public class Session implements Serializable, Deletable, Persistable<Long> {
     @Column(name = "version", nullable = false)
     private Long version;
 
+    @NotNull
     @Column(name = "deleted", nullable = false)
     private Boolean deleted = false;
 
+    @NotNull
+    @PastOrPresent
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
+    @NotNull
+    @Positive
     @Column(name = "pool_length", nullable = false)
     private Integer poolLength = 50;
 
+    @NotNull
+    @Positive
     @Column(name = "calories", nullable = false)
     private Integer calories;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

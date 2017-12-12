@@ -13,6 +13,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -38,30 +40,42 @@ public class SessionSet implements Serializable, Deletable, Persistable<Long> {
     @Column(name = "version", nullable = false)
     private Long version;
 
+    @NotNull
     @Column(name = "deleted", nullable = false)
     private Boolean deleted = false;
 
     @Column(name = "number", nullable = false)
     private Integer number;
 
+    @NotNull
     @Column(name = "swimming_time", nullable = false)
     private Duration swimmingTime;
 
+    @NotNull
     @Column(name = "rest_time", nullable = false)
     private Duration restTime;
 
+    @NotNull
+    @Positive
     @Column(name = "laps", nullable = false)
     private Integer laps;
 
+    @NotNull
+    @Positive
     @Column(name = "average_strokes", nullable = false)
     private Integer averageStrokes;
 
+    @NotNull
+    @Positive
     @Column(name = "speed", nullable = false)
     private Integer speed;
 
+    @NotNull
+    @Positive
     @Column(name = "efficiency_index", nullable = false)
     private Integer efficiencyIndex;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "session_id", nullable = false)
     private Session session;

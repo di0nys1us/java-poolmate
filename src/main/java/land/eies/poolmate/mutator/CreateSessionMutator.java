@@ -2,11 +2,13 @@ package land.eies.poolmate.mutator;
 
 import graphql.schema.DataFetchingEnvironment;
 
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Positive;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import land.eies.graphql.annotation.GraphQLFieldBinding;
 import land.eies.graphql.annotation.GraphQLMutator;
 import land.eies.graphql.mutator.Mutator;
+import land.eies.graphql.validation.ValidationException;
 import land.eies.poolmate.domain.Session;
+import land.eies.poolmate.mutator.validation.UserId;
 import land.eies.poolmate.repository.SessionRepository;
 import land.eies.poolmate.repository.UserRepository;
 import land.eies.poolmate.schema.Schema;
@@ -29,14 +33,17 @@ import land.eies.poolmate.schema.Schema;
 public class CreateSessionMutator implements Mutator<CreateSessionMutator.CreateSessionOutput> {
 
     private final ObjectMapper objectMapper;
+    private final Validator validator;
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
 
     @Autowired
     public CreateSessionMutator(final ObjectMapper objectMapper,
+                                final Validator validator,
                                 final SessionRepository sessionRepository,
                                 final UserRepository userRepository) {
         this.objectMapper = objectMapper;
+        this.validator = validator;
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
     }
@@ -44,6 +51,12 @@ public class CreateSessionMutator implements Mutator<CreateSessionMutator.Create
     @Override
     public CreateSessionOutput get(final DataFetchingEnvironment environment) {
         final CreateSessionInput input = objectMapper.convertValue(environment.getArgument("input"), CreateSessionInput.class);
+
+        final Set violations = validator.validate(input);
+
+        if (!violations.isEmpty()) {
+            throw new ValidationException(violations);
+        }
 
         final Session session = new Session();
 
@@ -72,6 +85,7 @@ public class CreateSessionMutator implements Mutator<CreateSessionMutator.Create
 
         @NotNull
         @Positive
+        @UserId
         public Long getUserId() {
             return userId;
         }
