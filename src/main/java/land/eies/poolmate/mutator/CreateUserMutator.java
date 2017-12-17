@@ -2,15 +2,17 @@ package land.eies.poolmate.mutator;
 
 import graphql.schema.DataFetchingEnvironment;
 
-import javax.validation.constraints.Email;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import land.eies.graphql.annotation.GraphQLFieldBinding;
 import land.eies.graphql.annotation.GraphQLMutator;
 import land.eies.graphql.mutator.Mutator;
+import land.eies.graphql.validation.ValidationException;
 import land.eies.poolmate.domain.User;
+import land.eies.poolmate.mutator.validation.Password;
+import land.eies.poolmate.mutator.validation.UniqueEmail;
 import land.eies.poolmate.repository.UserRepository;
 import land.eies.poolmate.schema.Schema;
 
@@ -29,14 +34,17 @@ import land.eies.poolmate.schema.Schema;
 public class CreateUserMutator implements Mutator<CreateUserMutator.CreateUserOutput> {
 
     private final ObjectMapper objectMapper;
+    private final Validator validator;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
     @Autowired
     public CreateUserMutator(final ObjectMapper objectMapper,
+                             final Validator validator,
                              final PasswordEncoder passwordEncoder,
                              final UserRepository userRepository) {
         this.objectMapper = objectMapper;
+        this.validator = validator;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }
@@ -45,16 +53,26 @@ public class CreateUserMutator implements Mutator<CreateUserMutator.CreateUserOu
     public CreateUserOutput get(final DataFetchingEnvironment environment) {
         final CreateUserInput input = objectMapper.convertValue(environment.getArgument("input"), CreateUserInput.class);
 
-        final User user = new User();
+        final Set<ConstraintViolation<CreateUserInput>> violations = validator.validate(input);
 
-        BeanUtils.copyProperties(input, user);
+        if (!violations.isEmpty()) {
+            throw new ValidationException(violations);
+        }
 
-        user.setHashedPassword(passwordEncoder.encode(input.getPassword()));
-
-        return new CreateUserOutput(userRepository.save(user));
+        return new CreateUserOutput(
+                userRepository.save(
+                        User.builder()
+                                .firstName(input.getFirstName())
+                                .lastName(input.getLastName())
+                                .email(input.getEmail())
+                                .hashedPassword(passwordEncoder.encode(input.getPassword()))
+                                .administrator(input.getAdministrator())
+                                .build()
+                )
+        );
     }
 
-    public static class CreateUserInput {
+    static class CreateUserInput {
 
         private final String firstName;
         private final String lastName;
@@ -85,13 +103,12 @@ public class CreateUserMutator implements Mutator<CreateUserMutator.CreateUserOu
             return lastName;
         }
 
-        @NotEmpty
-        @Email
+        @UniqueEmail
         public String getEmail() {
             return email;
         }
 
-        @NotEmpty
+        @Password
         public String getPassword() {
             return password;
         }
@@ -102,7 +119,7 @@ public class CreateUserMutator implements Mutator<CreateUserMutator.CreateUserOu
         }
     }
 
-    public static class CreateUserOutput {
+    static class CreateUserOutput {
 
         private final User user;
 

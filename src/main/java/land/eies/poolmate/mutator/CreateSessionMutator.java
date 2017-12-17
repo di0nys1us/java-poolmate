@@ -2,6 +2,7 @@ package land.eies.poolmate.mutator;
 
 import graphql.schema.DataFetchingEnvironment;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
@@ -14,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import land.eies.graphql.annotation.GraphQLFieldBinding;
@@ -52,20 +52,25 @@ public class CreateSessionMutator implements Mutator<CreateSessionMutator.Create
     public CreateSessionOutput get(final DataFetchingEnvironment environment) {
         final CreateSessionInput input = objectMapper.convertValue(environment.getArgument("input"), CreateSessionInput.class);
 
-        final Set violations = validator.validate(input);
+        final Set<ConstraintViolation<CreateSessionInput>> violations = validator.validate(input);
 
         if (!violations.isEmpty()) {
             throw new ValidationException(violations);
         }
 
-        final Session session = new Session();
-
-        BeanUtils.copyProperties(input, session);
-
-        return new CreateSessionOutput(sessionRepository.save(session));
+        return new CreateSessionOutput(
+                sessionRepository.save(
+                        Session.builder()
+                                .date(input.getDate())
+                                .poolLength(input.getPoolLength())
+                                .calories(input.getCalories())
+                                .user(userRepository.getOne(input.getUserId()))
+                                .build()
+                )
+        );
     }
 
-    public static class CreateSessionInput {
+    static class CreateSessionInput {
 
         private final Long userId;
         private final LocalDate date;
@@ -83,8 +88,6 @@ public class CreateSessionMutator implements Mutator<CreateSessionMutator.Create
             this.calories = calories;
         }
 
-        @NotNull
-        @Positive
         @UserId
         public Long getUserId() {
             return userId;
@@ -109,7 +112,7 @@ public class CreateSessionMutator implements Mutator<CreateSessionMutator.Create
         }
     }
 
-    public static class CreateSessionOutput {
+    static class CreateSessionOutput {
 
         private final Session session;
 

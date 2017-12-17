@@ -17,9 +17,9 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {UserIdValidator.class})
 @NotNull
 @Positive
-public @interface UserId {
+public @interface SessionId {
 
-    String message() default "{land.eies.poolmate.mutator.validation.UserId.message}";
+    String message() default "{land.eies.poolmate.mutator.validation.SessionId.message}";
 
     Class<?>[] groups() default {};
 

@@ -9,17 +9,17 @@ import land.eies.graphql.annotation.GraphQLValidator;
 import land.eies.poolmate.repository.UserRepository;
 
 @GraphQLValidator
-public class UserIdValidator implements ConstraintValidator<UserId, Long> {
+public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, String> {
 
     private final UserRepository userRepository;
 
     @Autowired
-    public UserIdValidator(final UserRepository userRepository) {
+    public UniqueEmailValidator(final UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    public boolean isValid(final Long value, final ConstraintValidatorContext context) {
-        return userRepository.existsById(value);
+    public boolean isValid(final String value, final ConstraintValidatorContext context) {
+        return !userRepository.existsByEmail(value);
     }
 }

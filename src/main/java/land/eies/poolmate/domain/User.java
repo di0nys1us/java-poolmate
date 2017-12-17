@@ -61,6 +61,22 @@ public class User implements Serializable, Deletable, Persistable<Long> {
     @Column(name = "administrator", nullable = false)
     private Boolean administrator = false;
 
+    User() {
+        // Hibernate
+    }
+
+    private User(final String firstName,
+                 final String lastName,
+                 final String email,
+                 final String hashedPassword,
+                 final boolean administrator) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.hashedPassword = hashedPassword;
+        this.administrator = administrator;
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -68,14 +84,6 @@ public class User implements Serializable, Deletable, Persistable<Long> {
 
     public Long getVersion() {
         return version;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(final Boolean deleted) {
-        this.deleted = deleted;
     }
 
     public String getFirstName() {
@@ -138,5 +146,57 @@ public class User implements Serializable, Deletable, Persistable<Long> {
     @Override
     public boolean isNew() {
         return id == null;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+
+        private String firstName;
+        private String lastName;
+        private String email;
+        private String hashedPassword;
+        private boolean administrator = false;
+
+        private Builder() {
+            // No operations
+        }
+
+        public Builder firstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public Builder lastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public Builder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder hashedPassword(String hashedPassword) {
+            this.hashedPassword = hashedPassword;
+            return this;
+        }
+
+        public Builder administrator(boolean administrator) {
+            this.administrator = administrator;
+            return this;
+        }
+
+        public User build() {
+            return new User(
+                    firstName,
+                    lastName,
+                    email,
+                    hashedPassword,
+                    administrator
+            );
+        }
     }
 }

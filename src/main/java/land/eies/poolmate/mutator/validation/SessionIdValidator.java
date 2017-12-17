@@ -6,20 +6,20 @@ import javax.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import land.eies.graphql.annotation.GraphQLValidator;
-import land.eies.poolmate.repository.UserRepository;
+import land.eies.poolmate.repository.SessionRepository;
 
 @GraphQLValidator
-public class UserIdValidator implements ConstraintValidator<UserId, Long> {
+public class SessionIdValidator implements ConstraintValidator<SessionId, Long> {
 
-    private final UserRepository userRepository;
+    private final SessionRepository sessionRepository;
 
     @Autowired
-    public UserIdValidator(final UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public SessionIdValidator(final SessionRepository sessionRepository) {
+        this.sessionRepository = sessionRepository;
     }
 
     @Override
     public boolean isValid(final Long value, final ConstraintValidatorContext context) {
-        return userRepository.existsById(value);
+        return sessionRepository.existsById(value);
     }
 }

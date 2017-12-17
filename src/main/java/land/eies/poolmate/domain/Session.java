@@ -65,6 +65,20 @@ public class Session implements Serializable, Deletable, Persistable<Long> {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    Session() {
+        // Hibernate
+    }
+
+    private Session(final LocalDate date,
+                    final Integer poolLength,
+                    final Integer calories,
+                    final User user) {
+        this.date = date;
+        this.poolLength = poolLength;
+        this.calories = calories;
+        this.user = user;
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -72,14 +86,6 @@ public class Session implements Serializable, Deletable, Persistable<Long> {
 
     public Long getVersion() {
         return version;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(final Boolean deleted) {
-        this.deleted = deleted;
     }
 
     public LocalDate getDate() {
@@ -110,10 +116,6 @@ public class Session implements Serializable, Deletable, Persistable<Long> {
         return user;
     }
 
-    public void setUser(final User user) {
-        this.user = user;
-    }
-
     @Override
     public void delete() {
         deleted = true;
@@ -134,5 +136,50 @@ public class Session implements Serializable, Deletable, Persistable<Long> {
     @Override
     public boolean isNew() {
         return id == null;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+
+        private LocalDate date;
+        private Integer poolLength = 50;
+        private Integer calories;
+        private User user;
+
+        private Builder() {
+            // No operations
+        }
+
+        public Builder date(LocalDate date) {
+            this.date = date;
+            return this;
+        }
+
+        public Builder poolLength(Integer poolLength) {
+            this.poolLength = poolLength;
+            return this;
+        }
+
+        public Builder calories(Integer calories) {
+            this.calories = calories;
+            return this;
+        }
+
+        public Builder user(User user) {
+            this.user = user;
+            return this;
+        }
+
+        public Session build() {
+            return new Session(
+                    date,
+                    poolLength,
+                    calories,
+                    user
+            );
+        }
     }
 }

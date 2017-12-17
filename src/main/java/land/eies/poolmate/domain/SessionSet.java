@@ -80,6 +80,26 @@ public class SessionSet implements Serializable, Deletable, Persistable<Long> {
     @JoinColumn(name = "session_id", nullable = false)
     private Session session;
 
+    SessionSet() {
+        // Hibernate
+    }
+
+    private SessionSet(final Duration swimmingTime,
+                       final Duration restTime,
+                       final Integer laps,
+                       final Integer averageStrokes,
+                       final Integer speed,
+                       final Integer efficiencyIndex,
+                       final Session session) {
+        this.swimmingTime = swimmingTime;
+        this.restTime = restTime;
+        this.laps = laps;
+        this.averageStrokes = averageStrokes;
+        this.speed = speed;
+        this.efficiencyIndex = efficiencyIndex;
+        this.session = session;
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -87,14 +107,6 @@ public class SessionSet implements Serializable, Deletable, Persistable<Long> {
 
     public Long getVersion() {
         return version;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(final Boolean deleted) {
-        this.deleted = deleted;
     }
 
     public Integer getNumber() {
@@ -153,10 +165,6 @@ public class SessionSet implements Serializable, Deletable, Persistable<Long> {
         return session;
     }
 
-    public void setSession(final Session session) {
-        this.session = session;
-    }
-
     @Override
     public void delete() {
         deleted = true;
@@ -177,5 +185,71 @@ public class SessionSet implements Serializable, Deletable, Persistable<Long> {
     @Override
     public boolean isNew() {
         return id == null;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+
+        private Duration swimmingTime;
+        private Duration restTime;
+        private Integer laps;
+        private Integer averageStrokes;
+        private Integer speed;
+        private Integer efficiencyIndex;
+        private Session session;
+
+        private Builder() {
+            // No operations
+        }
+
+        public Builder swimmingTime(Duration swimmingTime) {
+            this.swimmingTime = swimmingTime;
+            return this;
+        }
+
+        public Builder restTime(Duration restTime) {
+            this.restTime = restTime;
+            return this;
+        }
+
+        public Builder laps(Integer laps) {
+            this.laps = laps;
+            return this;
+        }
+
+        public Builder averageStrokes(Integer averageStrokes) {
+            this.averageStrokes = averageStrokes;
+            return this;
+        }
+
+        public Builder speed(Integer speed) {
+            this.speed = speed;
+            return this;
+        }
+
+        public Builder efficiencyIndex(Integer efficiencyIndex) {
+            this.efficiencyIndex = efficiencyIndex;
+            return this;
+        }
+
+        public Builder session(Session session) {
+            this.session = session;
+            return this;
+        }
+
+        public SessionSet build() {
+            return new SessionSet(
+                    swimmingTime,
+                    restTime,
+                    laps,
+                    averageStrokes,
+                    speed,
+                    efficiencyIndex,
+                    session
+            );
+        }
     }
 }
