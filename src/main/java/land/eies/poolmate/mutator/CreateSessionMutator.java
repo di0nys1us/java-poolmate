@@ -28,7 +28,8 @@ import land.eies.poolmate.repository.UserRepository;
 import land.eies.poolmate.schema.Schema;
 
 @GraphQLMutator(bindings = {
-        @GraphQLFieldBinding(fieldName = "createSession", parentType = Schema.MUTATION_TYPE_NAME)
+        @GraphQLFieldBinding(fieldName = "createSession", parentType = Schema.MUTATION_TYPE_NAME),
+        @GraphQLFieldBinding(fieldName = "updateSession", parentType = Schema.MUTATION_TYPE_NAME)
 })
 public class CreateSessionMutator implements Mutator<CreateSessionMutator.CreateSessionOutput> {
 

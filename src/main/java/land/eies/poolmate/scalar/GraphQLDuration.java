@@ -1,6 +1,5 @@
 package land.eies.poolmate.scalar;
 
-
 import graphql.language.StringValue;
 import graphql.schema.Coercing;
 import graphql.schema.CoercingParseValueException;

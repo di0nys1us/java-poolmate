@@ -27,7 +27,8 @@ import land.eies.poolmate.repository.SessionSetRepository;
 import land.eies.poolmate.schema.Schema;
 
 @GraphQLMutator(bindings = {
-        @GraphQLFieldBinding(fieldName = "createSessionSet", parentType = Schema.MUTATION_TYPE_NAME)
+        @GraphQLFieldBinding(fieldName = "createSessionSet", parentType = Schema.MUTATION_TYPE_NAME),
+        @GraphQLFieldBinding(fieldName = "updateSessionSet", parentType = Schema.MUTATION_TYPE_NAME),
 })
 public class CreateSessionSetMutator implements Mutator<CreateSessionSetMutator.CreateSessionSetOutput> {
 
@@ -59,6 +60,7 @@ public class CreateSessionSetMutator implements Mutator<CreateSessionSetMutator.
 
         return new CreateSessionSetOutput(
                 sessionSetRepository.save(SessionSet.builder()
+                        .number(input.getNumber())
                         .swimmingTime(input.getSwimmingTime())
                         .restTime(input.getRestTime())
                         .laps(input.getLaps())
@@ -73,6 +75,7 @@ public class CreateSessionSetMutator implements Mutator<CreateSessionSetMutator.
     static class CreateSessionSetInput {
 
         private final Long sessionId;
+        private final Integer number;
         private final Duration swimmingTime;
         private final Duration restTime;
         private final Integer laps;
@@ -82,6 +85,7 @@ public class CreateSessionSetMutator implements Mutator<CreateSessionSetMutator.
 
         @JsonCreator
         public CreateSessionSetInput(@JsonProperty("sessionId") final Long sessionId,
+                                     @JsonProperty("number") final Integer number,
                                      @JsonProperty("swimmingTime") final Duration swimmingTime,
                                      @JsonProperty("restTime") final Duration restTime,
                                      @JsonProperty("laps") final Integer laps,
@@ -89,6 +93,7 @@ public class CreateSessionSetMutator implements Mutator<CreateSessionSetMutator.
                                      @JsonProperty("speed") final Integer speed,
                                      @JsonProperty("efficiencyIndex") final Integer efficiencyIndex) {
             this.sessionId = sessionId;
+            this.number = number;
             this.swimmingTime = swimmingTime;
             this.restTime = restTime;
             this.laps = laps;
@@ -100,6 +105,12 @@ public class CreateSessionSetMutator implements Mutator<CreateSessionSetMutator.
         @SessionId
         public Long getSessionId() {
             return sessionId;
+        }
+
+        @NotNull
+        @Positive
+        public Integer getNumber() {
+            return number;
         }
 
         @NotNull

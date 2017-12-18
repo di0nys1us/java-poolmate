@@ -1,0 +1,44 @@
+type Query {
+    user(id: Long, email: String): User
+    users: [User!]!
+    session(id: Long!): Session
+    sessions(range: DateRange): [Session!]!
+    sessionSet(id: Long!): SessionSet
+    sessionSets(sessionId: Long): [SessionSet!]!
+}
+
+type User {
+    id: Long!
+    version: Long!
+    deleted: Boolean!
+    firstName: String!
+    lastName: String!
+    email: String!
+    administrator: Boolean!
+    sessions(range: DateRange): [Session!]!
+}
+
+type Session {
+    id: Long!
+    version: Long!
+    deleted: Boolean!
+    date: LocalDate!
+    poolLength: Int!
+    calories: Int!
+    user: User!
+    sessionSets: [SessionSet!]!
+}
+
+type SessionSet {
+    id: Long!
+    version: Long!
+    deleted: Boolean!
+    number: Int!
+    swimmingTime: Duration!
+    restTime: Duration!
+    laps: Int!
+    averageStrokes: Int!
+    speed: Int!
+    efficiencyIndex: Int!
+    session: Session!
+}

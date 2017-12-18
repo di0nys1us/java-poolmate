@@ -84,13 +84,15 @@ public class SessionSet implements Serializable, Deletable, Persistable<Long> {
         // Hibernate
     }
 
-    private SessionSet(final Duration swimmingTime,
+    private SessionSet(final Integer number,
+                       final Duration swimmingTime,
                        final Duration restTime,
                        final Integer laps,
                        final Integer averageStrokes,
                        final Integer speed,
                        final Integer efficiencyIndex,
                        final Session session) {
+        this.number = number;
         this.swimmingTime = swimmingTime;
         this.restTime = restTime;
         this.laps = laps;
@@ -111,6 +113,10 @@ public class SessionSet implements Serializable, Deletable, Persistable<Long> {
 
     public Integer getNumber() {
         return number;
+    }
+
+    public void setNumber(final Integer number) {
+        this.number = number;
     }
 
     public Duration getSwimmingTime() {
@@ -193,6 +199,7 @@ public class SessionSet implements Serializable, Deletable, Persistable<Long> {
 
     public static final class Builder {
 
+        private Integer number;
         private Duration swimmingTime;
         private Duration restTime;
         private Integer laps;
@@ -203,6 +210,11 @@ public class SessionSet implements Serializable, Deletable, Persistable<Long> {
 
         private Builder() {
             // No operations
+        }
+
+        public Builder number(Integer number) {
+            this.number = number;
+            return this;
         }
 
         public Builder swimmingTime(Duration swimmingTime) {
@@ -242,6 +254,7 @@ public class SessionSet implements Serializable, Deletable, Persistable<Long> {
 
         public SessionSet build() {
             return new SessionSet(
+                    number,
                     swimmingTime,
                     restTime,
                     laps,

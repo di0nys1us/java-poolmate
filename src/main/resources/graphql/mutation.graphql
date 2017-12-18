@@ -1,0 +1,121 @@
+type Mutation {
+    createUser(input: CreateUserInput!): CreateUserOutput!
+    updateUser(input: UpdateUserInput!): UpdateUserOutput!
+    deleteUser(input: DeleteUserInput!): DeleteUserOutput!
+    createSession(input: CreateSessionInput!): CreateSessionOutput!
+    updateSession(input: UpdateSessionInput!): UpdateSessionOutput!
+    deleteSession(input: DeleteSessionInput!): DeleteSessionOutput!
+    createSessionSet(input: CreateSessionSetInput!): CreateSessionSetOutput!
+    updateSessionSet(input: UpdateSessionSetInput!): UpdateSessionSetOutput!
+    deleteSessionSet(input: DeleteSessionSetInput!): DeleteSessionSetOutput!
+}
+
+input CreateUserInput {
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+    administrator: Boolean!
+}
+
+type CreateUserOutput {
+    user: User
+}
+
+input UpdateUserInput {
+    id: Long!
+    version: Long!
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+    administrator: Boolean!
+}
+
+type UpdateUserOutput {
+    user: User
+}
+
+input DeleteUserInput {
+    id: Long!
+    version: Long!
+    permanently: Boolean!
+}
+
+type DeleteUserOutput {
+    deleted: Boolean!
+}
+
+input CreateSessionInput {
+    userId: Long!
+    date: LocalDate!
+    poolLength: Int!
+    calories: Int!
+}
+
+type CreateSessionOutput {
+    session: Session
+}
+
+input UpdateSessionInput {
+    id: Long!
+    version: Long!
+    date: LocalDate!
+    poolLength: Int!
+    calories: Int!
+}
+
+type UpdateSessionOutput {
+    session: Session
+}
+
+input DeleteSessionInput {
+    id: Long!
+    version: Long!
+    permanently: Boolean!
+}
+
+type DeleteSessionOutput {
+    deleted: Boolean!
+}
+
+input CreateSessionSetInput {
+    sessionId: Long!
+    number: Int!
+    swimmingTime: Duration!
+    restTime: Duration!
+    laps: Int!
+    averageStrokes: Int!
+    speed: Int!
+    efficiencyIndex: Int!
+}
+
+type CreateSessionSetOutput {
+    sessionSet: SessionSet
+}
+
+input UpdateSessionSetInput {
+    id: Long!
+    version: Long!
+    number: Int!
+    swimmingTime: Duration!
+    restTime: Duration!
+    laps: Int!
+    averageStrokes: Int!
+    speed: Int!
+    efficiencyIndex: Int!
+}
+
+type UpdateSessionSetOutput {
+    sessionSet: SessionSet
+}
+
+input DeleteSessionSetInput {
+    id: Long!
+    version: Long!
+    permanently: Boolean!
+}
+
+type DeleteSessionSetOutput {
+    deleted: Boolean!
+}
