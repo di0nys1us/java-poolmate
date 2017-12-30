@@ -1,21 +1,35 @@
 type Mutation {
     createUser(input: CreateUserInput!): CreateUserOutput!
     updateUser(input: UpdateUserInput!): UpdateUserOutput!
-    deleteUser(input: DeleteUserInput!): DeleteUserOutput!
+    deleteUser(input: DeleteInput!): DeleteOutput!
     createSession(input: CreateSessionInput!): CreateSessionOutput!
     updateSession(input: UpdateSessionInput!): UpdateSessionOutput!
-    deleteSession(input: DeleteSessionInput!): DeleteSessionOutput!
+    deleteSession(input: DeleteInput!): DeleteOutput!
     createSessionSet(input: CreateSessionSetInput!): CreateSessionSetOutput!
     updateSessionSet(input: UpdateSessionSetInput!): UpdateSessionSetOutput!
-    deleteSessionSet(input: DeleteSessionSetInput!): DeleteSessionSetOutput!
+    deleteSessionSet(input: DeleteInput!): DeleteOutput!
 }
 
-input CreateUserInput {
+input DeleteInput {
+    id: Long!
+    version: Long!
+    permanently: Boolean!
+}
+
+type DeleteOutput {
+    deleted: Boolean!
+}
+
+input UserInput {
     firstName: String!
     lastName: String!
     email: String!
     password: String!
     administrator: Boolean!
+}
+
+input CreateUserInput {
+    user: UserInput!
 }
 
 type CreateUserOutput {
@@ -25,21 +39,11 @@ type CreateUserOutput {
 input UpdateUserInput {
     id: Long!
     version: Long!
-    firstName: String!
-    lastName: String!
-    email: String!
-    password: String!
-    administrator: Boolean!
+    user: UserInput!
 }
 
 type UpdateUserOutput {
     user: User
-}
-
-input DeleteUserInput {
-    id: Long!
-    version: Long!
-    permanently: Boolean!
 }
 
 type DeleteUserOutput {
