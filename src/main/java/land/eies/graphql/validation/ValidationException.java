@@ -22,6 +22,7 @@ public class ValidationException extends GraphQLException implements GraphQLErro
 
     public <T> ValidationException(final Set<ConstraintViolation<T>> violations) {
         super("ValidationException");
+
         if (violations != null) {
             this.violations.addAll(violations);
         }

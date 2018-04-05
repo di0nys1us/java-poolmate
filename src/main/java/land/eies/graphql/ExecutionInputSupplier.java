@@ -2,6 +2,7 @@ package land.eies.graphql;
 
 import graphql.ExecutionInput;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -22,17 +23,17 @@ public class ExecutionInputSupplier implements Supplier<ExecutionInput> {
                                   @JsonProperty("context") final Object context,
                                   @JsonProperty("root") final Object root,
                                   @JsonProperty("variables") final Map<String, Object> variables) {
-        this.query = query;
+        this.query = query == null ? "" : query;
         this.operationName = operationName;
         this.context = context;
         this.root = root;
-        this.variables = variables;
+        this.variables = variables == null ? Collections.emptyMap() : variables;
     }
 
     @Override
     public ExecutionInput get() {
         return ExecutionInput.newExecutionInput()
-                .query(this.query == null ? "" : this.query)
+                .query(this.query)
                 .operationName(this.operationName)
                 .context(this.context)
                 .root(this.root)

@@ -6,31 +6,35 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 
 import land.eies.graphql.annotation.GraphQLDataFetcher;
 import land.eies.graphql.annotation.GraphQLFieldBinding;
 import land.eies.poolmate.domain.SessionSet;
-import land.eies.poolmate.repository.SessionSetRepository;
-import land.eies.poolmate.schema.Schema;
+import land.eies.poolmate.type.SessionSetType;
 
 @GraphQLDataFetcher(bindings = {
-        @GraphQLFieldBinding(fieldName = "sessionSet", parentType = Schema.QUERY_TYPE_NAME)
+        @GraphQLFieldBinding(fieldName = "sessionSet", parentType = "Query")
 })
-public class SessionSetFetcher implements DataFetcher<Optional<SessionSet>> {
+public class SessionSetFetcher implements DataFetcher<Optional<SessionSetType>> {
 
-    private final SessionSetRepository sessionSetRepository;
+    private final ConversionService conversionService;
 
     @Autowired
-    public SessionSetFetcher(final SessionSetRepository sessionSetRepository) {
-        this.sessionSetRepository = sessionSetRepository;
+    public SessionSetFetcher(final ConversionService conversionService) {
+        this.conversionService = conversionService;
     }
 
     @Override
-    public Optional<SessionSet> get(final DataFetchingEnvironment environment) {
+    public Optional<SessionSetType> get(final DataFetchingEnvironment environment) {
         if (environment.containsArgument("id")) {
-            return sessionSetRepository.findById(environment.getArgument("id"));
+            return Optional.empty();
         }
 
         return Optional.empty();
+    }
+
+    private SessionSetType convert(final SessionSet sessionSet) {
+        return conversionService.convert(sessionSet, SessionSetType.class);
     }
 }

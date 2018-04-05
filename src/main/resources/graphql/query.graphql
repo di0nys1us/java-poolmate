@@ -1,38 +1,27 @@
 type Query {
-    user(id: Long, email: String): User
-    users: [User!]!
-    session(id: Long!): Session
-    sessions(range: DateRange): [Session!]!
-    sessionSet(id: Long!): SessionSet
-    sessionSets(sessionId: Long): [SessionSet!]!
-}
-
-type User {
-    id: Long!
-    version: Long!
-    deleted: Boolean!
-    firstName: String!
-    lastName: String!
-    email: String!
-    administrator: Boolean!
-    sessions(range: DateRange): [Session!]!
+    session(id: ID!): Session
+    sessions(range: DateRange): SessionList!
+    sets(sessionId: ID): SessionSetList!
 }
 
 type Session {
-    id: Long!
+    id: ID!
     version: Long!
     deleted: Boolean!
+    userId: String!
     date: LocalDate!
     poolLength: Int!
     calories: Int!
-    user: User!
-    sessionSets: [SessionSet!]!
+    sets: [SessionSet!]!
+    comments: [Comment!]!
+}
+
+type SessionList {
+    content: [Session!]!
 }
 
 type SessionSet {
-    id: Long!
-    version: Long!
-    deleted: Boolean!
+    sessionId: String!
     number: Int!
     swimmingTime: Duration!
     restTime: Duration!
@@ -41,4 +30,19 @@ type SessionSet {
     speed: Int!
     efficiencyIndex: Int!
     session: Session!
+}
+
+type SessionSetList {
+    content: [SessionSet!]!
+}
+
+type Comment {
+    sessionId: String!
+    userId: String!
+    dateTime: String!
+    text: String!
+}
+
+type CommentList {
+    content: [Comment!]!
 }

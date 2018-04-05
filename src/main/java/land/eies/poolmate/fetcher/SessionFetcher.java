@@ -6,38 +6,46 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 
 import land.eies.graphql.annotation.GraphQLDataFetcher;
 import land.eies.graphql.annotation.GraphQLFieldBinding;
 import land.eies.poolmate.domain.Session;
-import land.eies.poolmate.domain.SessionSet;
 import land.eies.poolmate.repository.SessionRepository;
-import land.eies.poolmate.schema.Schema;
+import land.eies.poolmate.type.SessionType;
 
 @GraphQLDataFetcher(bindings = {
-        @GraphQLFieldBinding(fieldName = "session", parentType = Schema.QUERY_TYPE_NAME),
-        @GraphQLFieldBinding(fieldName = "session", parentType = Schema.SESSION_SET_TYPE_NAME)
+        @GraphQLFieldBinding(fieldName = "session", parentType = "Query"),
+        @GraphQLFieldBinding(fieldName = "session", parentType = "SessionSet")
 })
-public class SessionFetcher implements DataFetcher<Optional<Session>> {
+public class SessionFetcher implements DataFetcher<Optional<SessionType>> {
 
+    private final ConversionService conversionService;
     private final SessionRepository sessionRepository;
 
     @Autowired
-    public SessionFetcher(final SessionRepository sessionRepository) {
+    public SessionFetcher(final ConversionService conversionService,
+                          final SessionRepository sessionRepository) {
+        this.conversionService = conversionService;
         this.sessionRepository = sessionRepository;
     }
 
     @Override
-    public Optional<Session> get(final DataFetchingEnvironment environment) {
+    public Optional<SessionType> get(final DataFetchingEnvironment environment) {
         if (environment.containsArgument("id")) {
-            return sessionRepository.findById(environment.getArgument("id"));
+            return sessionRepository.findById(FetcherSupport.getId(environment))
+                    .map(this::convert);
         }
 
-        if (Schema.SESSION_SET_TYPE_NAME.equals(environment.getParentType().getName())) {
-            final SessionSet sessionSet = environment.getSource();
-            return Optional.of(sessionSet.getSession());
+        if ("SessionSet".equals(environment.getParentType().getName())) {
+            final var sessionSet = environment.getSource();
+            return Optional.empty();
         }
 
         return Optional.empty();
+    }
+
+    private SessionType convert(final Session session) {
+        return conversionService.convert(session, SessionType.class);
     }
 }

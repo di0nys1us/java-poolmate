@@ -10,7 +10,6 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,10 +25,10 @@ public class GraphQLSpringConfiguration {
 
     @Bean
     public TypeDefinitionRegistry typeDefinitionRegistry(@Value("classpath:/graphql/**/*.graphql") final Resource[] resources) {
-        final SchemaParser parser = new SchemaParser();
-        final TypeDefinitionRegistry registry = new TypeDefinitionRegistry();
+        final var parser = new SchemaParser();
+        final var registry = new TypeDefinitionRegistry();
 
-        for (final Resource resource : resources) {
+        for (final var resource : resources) {
             try {
                 registry.merge(parser.parse(resource.getFile()));
             } catch (IOException e) {
@@ -42,11 +41,11 @@ public class GraphQLSpringConfiguration {
 
     @Bean
     public RuntimeWiring runtimeWiring(final ListableBeanFactory listableBeanFactory) {
-        final RuntimeWiring.Builder builder = RuntimeWiring.newRuntimeWiring()
+        final var builder = RuntimeWiring.newRuntimeWiring()
                 .wiringFactory(new GraphQLSpringWiringFactory(listableBeanFactory));
 
-        for (final Map.Entry<String, GraphQLScalarType> entry : listableBeanFactory.getBeansOfType(GraphQLScalarType.class).entrySet()) {
-            final GraphQLScalar annotation = listableBeanFactory.findAnnotationOnBean(entry.getKey(), GraphQLScalar.class);
+        for (final var entry : listableBeanFactory.getBeansOfType(GraphQLScalarType.class).entrySet()) {
+            final var annotation = listableBeanFactory.findAnnotationOnBean(entry.getKey(), GraphQLScalar.class);
 
             if (annotation == null) {
                 continue;

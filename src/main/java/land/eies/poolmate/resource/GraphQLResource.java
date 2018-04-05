@@ -1,6 +1,5 @@
 package land.eies.poolmate.resource;
 
-import graphql.ExecutionResult;
 import graphql.GraphQL;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +25,13 @@ public class GraphQLResource {
 
     @GetMapping
     public ResponseEntity get(final ExecutionInputSupplier executionInputSupplier) {
-        final ExecutionResult result = graphQL.execute(executionInputSupplier.get());
+        final var result = graphQL.execute(executionInputSupplier.get());
         return ResponseEntity.ok(result.toSpecification());
     }
 
     @PostMapping
     public ResponseEntity post(@RequestBody final ExecutionInputSupplier executionInputSupplier) {
-        final ExecutionResult result = graphQL.execute(executionInputSupplier.get());
+        final var result = graphQL.execute(executionInputSupplier.get());
         return ResponseEntity.ok(result.toSpecification());
     }
 }

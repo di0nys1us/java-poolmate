@@ -38,7 +38,7 @@ public class GraphQLDuration extends AbstractFactoryBean<GraphQLScalarType> {
 
             @Override
             public Duration serialize(final Object input) {
-                final Duration duration = parse(input);
+                final var duration = parse(input);
 
                 if (duration == null) {
                     throw new CoercingSerializeException("Invalid value '" + input + "' for Duration");
@@ -49,7 +49,7 @@ public class GraphQLDuration extends AbstractFactoryBean<GraphQLScalarType> {
 
             @Override
             public Duration parseValue(final Object input) {
-                final Duration duration = parse(input);
+                final var duration = parse(input);
 
                 if (duration == null) {
                     throw new CoercingParseValueException("Invalid value '" + input + "' for Duration");

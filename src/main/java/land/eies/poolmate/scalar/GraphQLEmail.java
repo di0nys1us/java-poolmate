@@ -34,7 +34,7 @@ public class GraphQLEmail extends AbstractFactoryBean<GraphQLScalarType> {
 
             @Override
             public String serialize(final Object input) {
-                final String email = parse(input);
+                final var email = parse(input);
 
                 if (email == null) {
                     throw new CoercingSerializeException("Invalid value '" + input + "' for Email");
@@ -45,7 +45,7 @@ public class GraphQLEmail extends AbstractFactoryBean<GraphQLScalarType> {
 
             @Override
             public String parseValue(final Object input) {
-                final String email = parse(input);
+                final var email = parse(input);
 
                 if (email == null) {
                     throw new CoercingParseValueException("Invalid value '" + input + "' for Email");

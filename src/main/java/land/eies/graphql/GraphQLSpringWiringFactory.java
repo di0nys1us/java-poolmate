@@ -1,5 +1,6 @@
 package land.eies.graphql;
 
+import graphql.GraphQLException;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
 import graphql.schema.idl.FieldWiringEnvironment;
@@ -8,13 +9,10 @@ import graphql.schema.idl.UnionWiringEnvironment;
 import graphql.schema.idl.WiringFactory;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import org.springframework.beans.factory.ListableBeanFactory;
 
 import land.eies.graphql.annotation.GraphQLDataFetcher;
-import land.eies.graphql.annotation.GraphQLFieldBinding;
 import land.eies.graphql.annotation.GraphQLMutator;
 import land.eies.graphql.annotation.GraphQLTypeResolver;
 import land.eies.graphql.mutator.Mutator;
@@ -58,30 +56,30 @@ public class GraphQLSpringWiringFactory implements WiringFactory {
     }
 
     private DataFetcher resolveDataFetcher(final String fieldName, final String parentType) {
-        final Map<String, DataFetcher> candidates = new HashMap<>();
+        final var candidates = new HashMap<String, DataFetcher>();
 
-        for (final Map.Entry<String, DataFetcher> entry : listableBeanFactory.getBeansOfType(DataFetcher.class).entrySet()) {
-            final GraphQLDataFetcher annotation = listableBeanFactory.findAnnotationOnBean(entry.getKey(), GraphQLDataFetcher.class);
+        for (final var entry : listableBeanFactory.getBeansOfType(DataFetcher.class).entrySet()) {
+            final var annotation = listableBeanFactory.findAnnotationOnBean(entry.getKey(), GraphQLDataFetcher.class);
 
             if (annotation == null) {
                 continue;
             }
 
-            for (final GraphQLFieldBinding binding : annotation.bindings()) {
+            for (final var binding : annotation.bindings()) {
                 if (binding.fieldName().equals(fieldName) && binding.parentType().equals(parentType)) {
                     candidates.put(entry.getKey(), entry.getValue());
                 }
             }
         }
 
-        for (final Map.Entry<String, Mutator> entry : listableBeanFactory.getBeansOfType(Mutator.class).entrySet()) {
-            final GraphQLMutator annotation = listableBeanFactory.findAnnotationOnBean(entry.getKey(), GraphQLMutator.class);
+        for (final var entry : listableBeanFactory.getBeansOfType(Mutator.class).entrySet()) {
+            final var annotation = listableBeanFactory.findAnnotationOnBean(entry.getKey(), GraphQLMutator.class);
 
             if (annotation == null) {
                 continue;
             }
 
-            for (final GraphQLFieldBinding binding : annotation.bindings()) {
+            for (final var binding : annotation.bindings()) {
                 if (binding.fieldName().equals(fieldName) && binding.parentType().equals(parentType)) {
                     candidates.put(entry.getKey(), entry.getValue());
                 }
@@ -89,19 +87,19 @@ public class GraphQLSpringWiringFactory implements WiringFactory {
         }
 
         if (candidates.size() > 1) {
-            throw new RuntimeException("error");
+            throw new GraphQLException("error");
         }
 
-        final Iterator<DataFetcher> iterator = candidates.values().iterator();
+        final var iterator = candidates.values().iterator();
 
         return iterator.hasNext() ? iterator.next() : null;
     }
 
     private TypeResolver resolveTypeResolver(final String typeName) {
-        final Map<String, TypeResolver> candidates = new HashMap<>();
+        final var candidates = new HashMap<String, TypeResolver>();
 
-        for (final Map.Entry<String, TypeResolver> entry : listableBeanFactory.getBeansOfType(TypeResolver.class).entrySet()) {
-            final GraphQLTypeResolver annotation = listableBeanFactory.findAnnotationOnBean(entry.getKey(), GraphQLTypeResolver.class);
+        for (final var entry : listableBeanFactory.getBeansOfType(TypeResolver.class).entrySet()) {
+            final var annotation = listableBeanFactory.findAnnotationOnBean(entry.getKey(), GraphQLTypeResolver.class);
 
             if (annotation == null) {
                 continue;
@@ -113,10 +111,10 @@ public class GraphQLSpringWiringFactory implements WiringFactory {
         }
 
         if (candidates.size() > 1) {
-            throw new RuntimeException("error");
+            throw new GraphQLException("error");
         }
 
-        final Iterator<TypeResolver> iterator = candidates.values().iterator();
+        final var iterator = candidates.values().iterator();
 
         return iterator.hasNext() ? iterator.next() : null;
     }

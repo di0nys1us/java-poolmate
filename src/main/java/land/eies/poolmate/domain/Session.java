@@ -1,15 +1,9 @@
 package land.eies.poolmate.domain;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
@@ -19,75 +13,107 @@ import javax.validation.constraints.Positive;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.NavigableSet;
+import java.util.Objects;
+import java.util.TreeSet;
+import java.util.UUID;
 
-import org.apache.commons.lang3.BooleanUtils;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
 import org.springframework.data.domain.Persistable;
 
+import land.eies.poolmate.domain.support.JsonType;
 import land.eies.poolmate.support.Deletable;
 
 @Entity
 @Table(name = "session", schema = "poolmate")
-public class Session implements Serializable, Deletable, Persistable<Long> {
+public class Session implements Serializable, Deletable, Persistable<UUID> {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "session_id_gen", sequenceName = "session_id_seq", schema = "poolmate", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "session_id_gen")
+    @GeneratedValue
     @Column(name = "id", nullable = false)
-    private Long id;
+    private UUID id;
 
     @Version
     @Column(name = "version", nullable = false)
-    private Long version;
+    private long version;
 
-    @NotNull
     @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
+    private boolean deleted;
 
-    @NotNull
-    @PastOrPresent
+    @Column(name = "user_id", nullable = false, updatable = false)
+    private UUID userId;
+
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @NotNull
-    @Positive
     @Column(name = "pool_length", nullable = false)
-    private Integer poolLength = 50;
+    private int poolLength = 50;
 
-    @NotNull
-    @Positive
     @Column(name = "calories", nullable = false)
-    private Integer calories;
+    private int calories;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "sets")
+    @Type(type = "land.eies.poolmate.domain.support.JsonType", parameters = {
+            @Parameter(
+                    name = JsonType.CANONICAL,
+                    value = "java.util.NavigableSet<land.eies.poolmate.domain.SessionSet>"
+            )
+    })
+    private NavigableSet<SessionSet> sets;
 
+    @Column(name = "comments")
+    @Type(type = "land.eies.poolmate.domain.support.JsonType", parameters = {
+            @Parameter(
+                    name = JsonType.CANONICAL,
+                    value = "java.util.NavigableSet<land.eies.poolmate.domain.Comment>"
+            )
+    })
+    private NavigableSet<Comment> comments;
+
+    @SuppressWarnings("unused")
     Session() {
-        // Hibernate
+        // JPA
     }
 
-    private Session(final LocalDate date,
-                    final Integer poolLength,
-                    final Integer calories,
-                    final User user) {
-        this.date = date;
+    private Session(final UUID userId,
+                    final LocalDate date,
+                    final int poolLength,
+                    final int calories,
+                    final NavigableSet<SessionSet> sets,
+                    final NavigableSet<Comment> comments) {
+        this.userId = Objects.requireNonNull(userId, "userId was null");
+        this.date = Objects.requireNonNull(date, "date was null");
         this.poolLength = poolLength;
         this.calories = calories;
-        this.user = user;
+        this.sets = Objects.requireNonNull(sets, "sets was null");
+        this.comments = Objects.requireNonNull(comments, "comments was null");
     }
 
     @Override
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public Long getVersion() {
+    public long getVersion() {
         return version;
     }
 
+    @Override
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    @NotNull
+    public UUID getUserId() {
+        return userId;
+    }
+
+    @NotNull
+    @PastOrPresent
     public LocalDate getDate() {
         return date;
     }
@@ -96,24 +122,40 @@ public class Session implements Serializable, Deletable, Persistable<Long> {
         this.date = date;
     }
 
-    public Integer getPoolLength() {
+    @Positive
+    public int getPoolLength() {
         return poolLength;
     }
 
-    public void setPoolLength(final Integer poolLength) {
+    public void setPoolLength(final int poolLength) {
         this.poolLength = poolLength;
     }
 
-    public Integer getCalories() {
+    @Positive
+    public int getCalories() {
         return calories;
     }
 
-    public void setCalories(final Integer calories) {
+    public void setCalories(final int calories) {
         this.calories = calories;
     }
 
-    public User getUser() {
-        return user;
+    @NotNull
+    public NavigableSet<SessionSet> getSets() {
+        return Collections.unmodifiableNavigableSet(sets);
+    }
+
+    public void setSets(final NavigableSet<SessionSet> sets) {
+        this.sets = sets;
+    }
+
+    @NotNull
+    public NavigableSet<Comment> getComments() {
+        return Collections.unmodifiableNavigableSet(comments);
+    }
+
+    public void setComments(final NavigableSet<Comment> comments) {
+        this.comments = comments;
     }
 
     @Override
@@ -128,12 +170,6 @@ public class Session implements Serializable, Deletable, Persistable<Long> {
 
     @Transient
     @Override
-    public boolean isDeleted() {
-        return BooleanUtils.isTrue(deleted);
-    }
-
-    @Transient
-    @Override
     public boolean isNew() {
         return id == null;
     }
@@ -144,13 +180,20 @@ public class Session implements Serializable, Deletable, Persistable<Long> {
 
     public static final class Builder {
 
+        private UUID userId;
         private LocalDate date;
-        private Integer poolLength = 50;
-        private Integer calories;
-        private User user;
+        private int poolLength = 50;
+        private int calories;
+        private NavigableSet<SessionSet> sets = new TreeSet<>();
+        private NavigableSet<Comment> comments = new TreeSet<>();
 
         private Builder() {
             // No operations
+        }
+
+        public Builder userId(UUID userId) {
+            this.userId = userId;
+            return this;
         }
 
         public Builder date(LocalDate date) {
@@ -158,27 +201,34 @@ public class Session implements Serializable, Deletable, Persistable<Long> {
             return this;
         }
 
-        public Builder poolLength(Integer poolLength) {
+        public Builder poolLength(int poolLength) {
             this.poolLength = poolLength;
             return this;
         }
 
-        public Builder calories(Integer calories) {
+        public Builder calories(int calories) {
             this.calories = calories;
             return this;
         }
 
-        public Builder user(User user) {
-            this.user = user;
+        public Builder sets(final NavigableSet<SessionSet> sets) {
+            this.sets = sets;
+            return this;
+        }
+
+        public Builder comments(final NavigableSet<Comment> comments) {
+            this.comments = comments;
             return this;
         }
 
         public Session build() {
             return new Session(
+                    userId,
                     date,
                     poolLength,
                     calories,
-                    user
+                    sets,
+                    comments
             );
         }
     }

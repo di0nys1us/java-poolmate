@@ -38,7 +38,7 @@ public class GraphQLLocalDate extends AbstractFactoryBean<GraphQLScalarType> {
 
             @Override
             public LocalDate serialize(final Object input) {
-                final LocalDate localDate = parse(input);
+                final var localDate = parse(input);
 
                 if (localDate == null) {
                     throw new CoercingSerializeException("Invalid value '" + input + "' for LocalDate");
@@ -49,7 +49,7 @@ public class GraphQLLocalDate extends AbstractFactoryBean<GraphQLScalarType> {
 
             @Override
             public LocalDate parseValue(final Object input) {
-                final LocalDate localDate = parse(input);
+                final var localDate = parse(input);
 
                 if (localDate == null) {
                     throw new CoercingParseValueException("Invalid value '" + input + "' for LocalDate");

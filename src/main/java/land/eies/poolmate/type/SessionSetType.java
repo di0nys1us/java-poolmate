@@ -1,22 +1,17 @@
-package land.eies.poolmate.domain;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+package land.eies.poolmate.type;
 
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SessionSet implements Serializable, Comparable<SessionSet> {
+public class SessionSetType implements Serializable, Comparable<SessionSetType> {
 
     private static final long serialVersionUID = 1L;
 
-    private final UUID sessionId;
+    private final String sessionId;
     private final int number;
     private final Duration swimmingTime;
     private final Duration restTime;
@@ -25,15 +20,14 @@ public class SessionSet implements Serializable, Comparable<SessionSet> {
     private final int speed;
     private final int efficiencyIndex;
 
-    @JsonCreator
-    SessionSet(@JsonProperty("sessionId") final UUID sessionId,
-               @JsonProperty("number") final int number,
-               @JsonProperty("swimmingTime") final Duration swimmingTime,
-               @JsonProperty("restTime") final Duration restTime,
-               @JsonProperty("laps") final int laps,
-               @JsonProperty("averageStrokes") final int averageStrokes,
-               @JsonProperty("speed") final int speed,
-               @JsonProperty("efficiencyIndex") final int efficiencyIndex) {
+    private SessionSetType(final String sessionId,
+                           final int number,
+                           final Duration swimmingTime,
+                           final Duration restTime,
+                           final int laps,
+                           final int averageStrokes,
+                           final int speed,
+                           final int efficiencyIndex) {
         this.sessionId = Objects.requireNonNull(sessionId, "sessionId was null");
         this.number = number;
         this.swimmingTime = Objects.requireNonNull(swimmingTime, "swimmingTime was null");
@@ -44,49 +38,41 @@ public class SessionSet implements Serializable, Comparable<SessionSet> {
         this.efficiencyIndex = efficiencyIndex;
     }
 
-    @NotNull
     @JsonProperty("sessionId")
-    public UUID getSessionId() {
+    public String getSessionId() {
         return sessionId;
     }
 
-    @Positive
     @JsonProperty("number")
     public int getNumber() {
         return number;
     }
 
-    @NotNull
     @JsonProperty("swimmingTime")
     public Duration getSwimmingTime() {
         return swimmingTime;
     }
 
-    @NotNull
     @JsonProperty("restTime")
     public Duration getRestTime() {
         return restTime;
     }
 
-    @Positive
     @JsonProperty("laps")
     public int getLaps() {
         return laps;
     }
 
-    @Positive
     @JsonProperty("averageStrokes")
     public int getAverageStrokes() {
         return averageStrokes;
     }
 
-    @Positive
     @JsonProperty("speed")
     public int getSpeed() {
         return speed;
     }
 
-    @Positive
     @JsonProperty("efficiencyIndex")
     public int getEfficiencyIndex() {
         return efficiencyIndex;
@@ -102,7 +88,7 @@ public class SessionSet implements Serializable, Comparable<SessionSet> {
             return false;
         }
 
-        final var other = (SessionSet) object;
+        final var other = (SessionSetType) object;
 
         return Objects.equals(this.sessionId, other.sessionId)
                 && number == other.number;
@@ -114,9 +100,9 @@ public class SessionSet implements Serializable, Comparable<SessionSet> {
     }
 
     @Override
-    public int compareTo(final SessionSet other) {
-        return Comparator.comparing(SessionSet::getSessionId)
-                .thenComparing(SessionSet::getNumber)
+    public int compareTo(final SessionSetType other) {
+        return Comparator.comparing(SessionSetType::getSessionId)
+                .thenComparing(SessionSetType::getNumber)
                 .compare(this, other);
     }
 
@@ -126,7 +112,7 @@ public class SessionSet implements Serializable, Comparable<SessionSet> {
 
     public static final class Builder {
 
-        private UUID sessionId;
+        private String sessionId;
         private int number;
         private Duration swimmingTime;
         private Duration restTime;
@@ -139,7 +125,7 @@ public class SessionSet implements Serializable, Comparable<SessionSet> {
             // No operations
         }
 
-        public Builder sessionId(final UUID sessionId) {
+        public Builder sessionId(final String sessionId) {
             this.sessionId = sessionId;
             return this;
         }
@@ -179,8 +165,8 @@ public class SessionSet implements Serializable, Comparable<SessionSet> {
             return this;
         }
 
-        public SessionSet build() {
-            return new SessionSet(
+        public SessionSetType build() {
+            return new SessionSetType(
                     sessionId,
                     number,
                     swimmingTime,
